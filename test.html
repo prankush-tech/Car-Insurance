@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Underwriter Admin Homepage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        input[type="text"], input[type="password"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0 20px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Underwriter Admin Homepage</h1>
+        
+        <button onclick="showSection('registration')">Underwriter Registration</button>
+        <button onclick="showSection('search')">Search Underwriter by ID</button>
+        <button onclick="showSection('updatePassword')">Update Underwriter Password</button>
+        <button onclick="showSection('delete')">Delete Underwriter by ID</button>
+        <button onclick="showSection('viewAll')">View All Underwriters</button>
+
+        <div id="registration" class="hidden">
+            <h2>Underwriter Registration</h2>
+            <form id="registrationForm">
+                <label for="underwriterId">Underwriter ID:</label>
+                <input type="text" id="underwriterId" readonly>
+                
+                <label for="name">Name:</label>
+                <input type="text" id="name" maxlength="50" required>
+                
+                <label for="dob">Date of Birth:</label>
+                <input type="date" id="dob" required>
+                
+                <label for="joiningDate">Joining Date:</label>
+                <input type="date" id="joiningDate" required>
+                
+                <label for="defaultPassword">Default Password:</label>
+                <input type="password" id="defaultPassword" required>
+                
+                <button type="submit">Register</button>
+            </form>
+        </div>
+
+        <div id="search" class="hidden">
+            <h2>Search Underwriter by ID</h2>
+            <input type="text" id="searchId" placeholder="Enter Underwriter ID">
+            <button onclick="searchUnderwriter()">Search</button>
+            <div id="searchResult"></div>
+        </div>
+
+        <div id="updatePassword" class="hidden">
+            <h2>Update Underwriter Password</h2>
+            <input type="text" id="updateId" placeholder="Enter Underwriter ID">
+            <input type="password" id="newPassword" placeholder="Enter New Password">
+            <button onclick="updateUnderwriterPassword()">Update Password</button>
+        </div>
+
+        <div id="delete" class="hidden">
+            <h2>Delete Underwriter by ID</h2>
+            <input type="text" id="deleteId" placeholder="Enter Underwriter ID">
+            <button onclick="deleteUnderwriter()">Delete</button>
+        </div>
+
+        <div id="viewAll" class="hidden">
+            <h2>View All Underwriters</h2>
+            <table id="underwritersTable">
+                <thead>
+                    <tr>
+                        <th>Underwriter ID</th>
+                        <th>Name</th>
+                        <th>DOB</th>
+                        <th>Joining Date</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let underwriters = [];
+        let currentId = 1000;
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            if (sectionId === 'registration') {
+                document.getElementById('underwriterId').value = currentId;
+            }
+            if (sectionId === 'viewAll') {
+                displayAllUnderwriters();
+            }
+        }
+
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let underwriter = {
+                id: currentId,
+                name: document.getElementById('name').value,
+                dob: document.getElementById('dob').value,
+                joiningDate: document.getElementById('joiningDate').value,
+                password: document.getElementById('defaultPassword').value
+            };
+            if (!isValidPassword(underwriter.password)) {
+                alert('Password must contain at least one special character and be alphanumeric.');
+                return;
+            }
+            underwriters.push(underwriter);
+            currentId++;
+            alert('Underwriter registered successfully!');
+            this.reset();
+            document.getElementById('underwriterId').value = currentId;
+        });
+
+        function isValidPassword(password) {
+            return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password);
+        }
+
+        function searchUnderwriter() {
+            let id = document.getElementById('searchId').value;
+            let underwriter = underwriters.find(u => u.id == id);
+            let resultDiv = document.getElementById('searchResult');
+            if (underwriter) {
+                resultDiv.innerHTML = `
+                    <p>Name: ${underwriter.name}</p>
+                    <p>DOB: ${underwriter.dob}</p>
+                    <p>Joining Date: ${underwriter.joiningDate}</p>
+                `;
+            } else {
+                resultDiv.innerHTML = '<p>Underwriter not found.</p>';
+            }
+        }
+
+        function updateUnderwriterPassword() {
+            let id = document.getElementById('updateId').value;
+            let newPassword = document.getElementById('newPassword').value;
+            let underwriter = underwriters.find(u => u.id == id);
+            if (underwriter && isValidPassword(newPassword)) {
+                underwriter.password = newPassword;
+                alert('Password updated successfully!');
+            } else {
+                alert('Underwriter not found or invalid password.');
+            }
+        }
+
+        function deleteUnderwriter() {
+            let id = document.getElementById('deleteId').value;
+            let index = underwriters.findIndex(u => u.id == id);
+            if (index !== -1) {
+                underwriters.splice(index, 1);
+                alert('Underwriter deleted successfully!');
+            } else {
+                alert('Underwriter not found.');
+            }
+        }
+
+        function displayAllUnderwriters() {
+            let tbody = document.querySelector('#underwritersTable tbody');
+            tbody.innerHTML = '';
+            underwriters.forEach(u => {
+                let row = tbody.insertRow();
+                row.insertCell(0).textContent = u.id;
+                row.insertCell(1).textContent = u.name;
+                row.insertCell(2).textContent = u.dob;
+                row.insertCell(3).textContent = u.joiningDate;
+            });
+        }
+    </script>
+</body>
+</html>

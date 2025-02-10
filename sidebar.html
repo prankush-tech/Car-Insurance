@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Sidebar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #2c3e50;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 60px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background: #1abc9c;
+        }
+
+        /* Toggle Button */
+        .menu-btn {
+            display: none;
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: white;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* Responsive Behavior */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 200px;
+            }
+
+            .menu-btn {
+                display: block;
+                background: #2c3e50;
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+            /* Show sidebar when checked */
+            #menu-toggle:checked ~ .sidebar {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <input type="checkbox" id="menu-toggle" style="display: none;">
+    <label for="menu-toggle" class="menu-btn">&#9776;</label>
+
+    <div class="sidebar">
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Services</a>
+        <a href="#">Contact</a>
+    </div>
+
+</body>
+</html>
